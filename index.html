@@ -431,7 +431,7 @@
             <!-- Stage 2: The Message -->
             <div id="gift-stage-2" class="hidden mt-8">
                 <h1 class="text-5xl md:text-7xl font-rock text-red-500 animate-pulse mb-8 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]">
-                    PODES ABRIR A PRENDA!
+                    PODEM ABRIR A PRENDA!
                 </h1>
                 
                 <div class="text-8xl my-10 animate-bounce">
@@ -468,16 +468,18 @@
         // ============================================
         const quizTracks = [
             // QUIZZ 1 - MÚSICA (Link MP3)
-            "https://github.com/koelho2000/QUIZZ-NATAL-2026/blob/7f6fc01811c7efa1bb7dae1267cff7411efafe9f/Post%20Malone%20-%20Congratulations%20(Official%20Music%20Video)%20ft.%20Quavo.mp3", 
+            "https://raw.githubusercontent.com/koelho2000/QUIZZ-NATAL-2026/7f6fc01811c7efa1bb7dae1267cff7411efafe9f/Post%20Malone%20-%20Congratulations%20(Official%20Music%20Video)%20ft.%20Quavo.mp3", 
             // QUIZZ 2 - BILHETE (Link MP3)
-            "https://github.com/koelho2000/QUIZZ-NATAL-2026/blob/7f6fc01811c7efa1bb7dae1267cff7411efafe9f/Taylor%20Swift%20-%20The%20Fate%20of%20Ophelia%20(Official%20Music%20Video)%20%5Bko70cExuzZM%5D.mp3",
+            "https://raw.githubusercontent.com/koelho2000/QUIZZ-NATAL-2026/7f6fc01811c7efa1bb7dae1267cff7411efafe9f/Taylor%20Swift%20-%20The%20Fate%20of%20Ophelia%20(Official%20Music%20Video)%20%5Bko70cExuzZM%5D.mp3",
             // QUIZZ 3 - AVIÃO (Link MP3)
-            "https://github.com/koelho2000/QUIZZ-NATAL-2026/blob/7f6fc01811c7efa1bb7dae1267cff7411efafe9f/Harry%20Styles%20-%20As%20It%20Was%20(Official%20Video)%20%5BH5v3kku4y6Q%5D.mp3",
+            "https://raw.githubusercontent.com/koelho2000/QUIZZ-NATAL-2026/7f6fc01811c7efa1bb7dae1267cff7411efafe9f/Harry%20Styles%20-%20As%20It%20Was%20(Official%20Video)%20%5BH5v3kku4y6Q%5D.mp3",
             // QUIZZ 4 - SURPRESA (Link MP3)
-            "https://github.com/koelho2000/QUIZZ-NATAL-2026/blob/7f6fc01811c7efa1bb7dae1267cff7411efafe9f/Ariana%20Grande%20-%207%20rings%20(Official%20Video).mp3" 
+            "https://raw.githubusercontent.com/koelho2000/QUIZZ-NATAL-2026/7f6fc01811c7efa1bb7dae1267cff7411efafe9f/Ariana%20Grande%20-%207%20rings%20(Official%20Video).mp3" 
         ];
-        // Nota: Usei previews do Spotify como exemplo de placeholder. 
-        // Substitui por links Raw do GitHub (ex: https://github.com/user/repo/raw/main/song.mp3)
+
+        // MÚSICA FINAL (We Are The Champions)
+        const finalTrackUrl = "https://raw.githubusercontent.com/koelho2000/QUIZZ-NATAL-2026/79e49621298e15854e4242ccbf2a1175fce40102/Queen%20-%20We%20Are%20The%20Champions%20(Live).mp3";
+        
         // ============================================
 
         const cousins = ['Sara', 'Sofia', 'João', 'Gonçalo'];
@@ -634,6 +636,7 @@
         // --- AUDIO ENGINE ---
         let audioCtx;
         let backgroundAudio = null;
+        let currentTrackUrl = ""; // Track current URL
 
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -641,22 +644,22 @@
         }
 
         function playBackgroundMusic(stageIndex) {
-            // If we are already playing this track, do nothing
-            // (Note: we stop music on answer, so we usually need to restart)
-            
-            if (backgroundAudio) {
-                backgroundAudio.pause();
-                backgroundAudio = null;
-            }
-
             const url = quizTracks[stageIndex];
             if (!url) return;
 
+            // Check if same track is already playing
+            if (backgroundAudio && currentTrackUrl === url && !backgroundAudio.paused) {
+                return; // Do nothing, let it play
+            }
+
+            // If different track or not playing, stop previous and start new
+            stopBackgroundMusic(); 
+
+            currentTrackUrl = url;
             backgroundAudio = new Audio(url);
             backgroundAudio.loop = true;
             backgroundAudio.volume = 0.5;
             
-            // Visualizer Show
             document.getElementById('music-bars').classList.remove('opacity-0');
 
             backgroundAudio.play().catch(e => {
@@ -669,7 +672,9 @@
             if (backgroundAudio) {
                 backgroundAudio.pause();
                 backgroundAudio.currentTime = 0;
+                backgroundAudio = null;
             }
+            currentTrackUrl = ""; // Reset
             document.getElementById('music-bars').classList.add('opacity-0');
         }
 
@@ -691,7 +696,8 @@
                 osc.stop(audioCtx.currentTime + 0.1);
             } else if (type === 'win') {
                 // Success chord
-                stopBackgroundMusic(); // Stop beat on win/interim
+                // REMOVIDO: stopBackgroundMusic(); -> A música continua!
+                
                 const osc1 = audioCtx.createOscillator();
                 const osc2 = audioCtx.createOscillator();
                 const osc3 = audioCtx.createOscillator();
@@ -808,7 +814,8 @@
         }
 
         function checkAnswer(selectedIndex) {
-            stopBackgroundMusic(); // Silence on answer for suspense
+            // REMOVED stopBackgroundMusic() here so music continues!
+            
             const q = allQuestions[currentQIndex];
             const currentCousin = cousinOrder[currentQIndex];
             const buttons = document.getElementById('options-grid').children;
@@ -918,8 +925,14 @@
         }
 
         function showFinalResult() {
-            playSound('win');
-            
+            // STOP QUIZ MUSIC
+            stopBackgroundMusic();
+
+            // PLAY QUEEN (WE ARE THE CHAMPIONS)
+            const finalAudio = new Audio(finalTrackUrl);
+            finalAudio.volume = 0.6;
+            finalAudio.play().catch(e => console.log("Final music error:", e));
+
             // Mark last stage completed
             document.getElementById(`stage-3`).classList.add('completed');
             document.getElementById(`stage-3`).classList.remove('active');
