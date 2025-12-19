@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIZZ NATAL 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .font-rock {
+            font-family: 'Permanent Marker', cursive;
+        }
+
+        .font-banger {
+            font-family: 'Bangers', cursive;
+        }
+
+        /* Christmas Lights Animation */
+        .lights-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .light {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin: 0 10px;
+            animation: flash 2s infinite alternate;
+        }
+
+        .light:nth-child(odd) { background: #ef4444; box-shadow: 0 0 10px #ef4444; animation-delay: 0.5s; }
+        .light:nth-child(even) { background: #22c55e; box-shadow: 0 0 10px #22c55e; animation-delay: 1s; }
+
+        @keyframes flash {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Card Animations */
+        .card-enter {
+            animation: slideIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(50px) scale(0.9); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .option-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(255,255,255,0.2);
+        }
+        
+        /* Gift Animation */
+        .gift-box {
+            font-size: 5rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .gift-box:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        .gift-open {
+            animation: openBox 1s forwards;
+        }
+        @keyframes openBox {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2) rotate(-10deg); }
+            100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+
+        /* Snow effect */
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            color: #fff;
+            font-size: 1em;
+            opacity: 0.8;
+            z-index: 1;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to { transform: translateY(100vh); }
+        }
+
+        /* Discret button */
+        .secret-btn {
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+        .secret-btn:hover {
+            opacity: 1;
+        }
+        
+        /* Results Table */
+        .results-table tr {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .results-table td {
+            padding: 8px;
+        }
+
+        /* Equalizer Animation */
+        .music-indicator {
+            display: inline-flex;
+            align-items: flex-end;
+            height: 20px;
+            margin-left: 10px;
+        }
+        .bar {
+            width: 4px;
+            background: #facc15;
+            margin: 0 2px;
+            animation: equalize 1s infinite;
+        }
+        .bar:nth-child(1) { animation-delay: 0.1s; height: 10px; }
+        .bar:nth-child(2) { animation-delay: 0.3s; height: 15px; }
+        .bar:nth-child(3) { animation-delay: 0.0s; height: 20px; }
+        .bar:nth-child(4) { animation-delay: 0.4s; height: 12px; }
+
+        @keyframes equalize {
+            0% { height: 5px; }
+            50% { height: 20px; }
+            100% { height: 5px; }
+        }
+
+        /* Sidebar Progress */
+        .progress-sidebar {
+            position: fixed;
+            z-index: 40;
+            display: flex;
+            gap: 1rem;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+
+        /* Desktop: Left side vertical */
+        @media (min-width: 1024px) {
+            .progress-sidebar {
+                flex-direction: column;
+                left: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 100px;
+            }
+        }
+        
+        /* Mobile: Top horizontal */
+        @media (max-width: 1023px) {
+            .progress-sidebar {
+                flex-direction: row;
+                top: 40px; /* Below lights */
+                left: 50%;
+                transform: translateX(-50%);
+                width: max-content;
+                padding: 5px 15px;
+            }
+            .stage-label {
+                display: none; /* Hide text on mobile to save space */
+            }
+        }
+
+        .stage-item {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.4;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .stage-item.visible {
+            display: flex; /* Shown via JS */
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 0.4; transform: scale(1); }
+        }
+
+        .stage-item.active {
+            opacity: 1 !important;
+            transform: scale(1.1);
+        }
+        .stage-item.completed {
+            opacity: 1 !important;
+            color: #4ade80; /* green */
+        }
+        .stage-icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+        .stage-item.active .stage-icon {
+            background: #facc15;
+            color: #000;
+            box-shadow: 0 0 15px #facc15;
+        }
+        .stage-label {
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .check-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #22c55e;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #0f172a;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .stage-item.completed .check-badge {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-slate-900 via-slate-800 to-black relative">
+
+    <!-- Christmas Lights -->
+    <div class="lights-container" id="lights">
+        <!-- Lights injected via JS -->
+    </div>
+
+    <!-- Progress Sidebar -->
+    <div id="sidebar" class="progress-sidebar hidden">
+        <!-- Stage 1: MUSICA -->
+        <div id="stage-0" class="stage-item">
+            <div class="stage-icon"><i class="fas fa-music"></i></div>
+            <div class="stage-label">Música</div>
+            <div class="check-badge"><i class="fas fa-check"></i></div>
+        </div>
+        <!-- Stage 2: BILHETE -->
+        <div id="stage-1" class="stage-item">
+            <div class="stage-icon"><i class="fas fa-ticket-alt"></i></div>
+            <div class="stage-label">Bilhete</div>
+            <div class="check-badge"><i class="fas fa-check"></i></div>
+        </div>
+        <!-- Stage 3: AVIÃO -->
+        <div id="stage-2" class="stage-item">
+            <div class="stage-icon"><i class="fas fa-plane"></i></div>
+            <div class="stage-label">Avião</div>
+            <div class="check-badge"><i class="fas fa-check"></i></div>
+        </div>
+        <!-- Stage 4: SURPRESA -->
+        <div id="stage-3" class="stage-item">
+            <div class="stage-icon"><i class="fas fa-gift"></i></div>
+            <div class="stage-label">Surpresa</div>
+            <div class="check-badge"><i class="fas fa-check"></i></div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="app" class="w-full max-w-2xl px-4 z-10 relative pb-10 mt-16 lg:mt-0">
+        
+        <!-- START SCREEN -->
+        <div id="start-screen" class="text-center card-enter">
+            <h1 class="text-6xl md:text-7xl font-banger text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-green-500 to-red-500 mb-6 drop-shadow-lg tracking-wider">
+                QUIZZ NATAL 2026
+            </h1>
+            <div class="mb-8 relative inline-block">
+                <i class="fas fa-guitar text-6xl text-yellow-400 transform -rotate-12"></i>
+                <i class="fas fa-holly-berry text-5xl text-red-500 absolute -top-4 -right-4"></i>
+            </div>
+            <p class="text-xl md:text-2xl text-gray-300 font-rock mb-8">
+                Quem vai partir a loiça toda nos festivais?<br>
+                <span class="text-sm font-sans opacity-70">(Sara, Sofia, João, Gonçalo... preparem-se!)</span>
+            </p>
+            <p class="text-xs text-gray-500 mb-6"><i class="fas fa-volume-up"></i> Som Ativado (Música + Efeitos)</p>
+            <button onclick="startGame()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-10 rounded-full text-2xl shadow-lg border-b-4 border-red-900 transition-all active:border-b-0 active:translate-y-1">
+                COMEÇAR O SHOW! 🤘
+            </button>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="game-screen" class="hidden">
+            <!-- Header Info -->
+            <div class="flex justify-between items-center mb-6 bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                <div class="text-yellow-400 font-banger text-2xl flex items-center">
+                    <i class="fas fa-question-circle mr-2"></i><span id="score-display">?</span>
+                    <div id="music-bars" class="music-indicator opacity-0 transition-opacity">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    </div>
+                </div>
+                <div class="text-gray-400 text-sm font-bold tracking-widest text-right">
+                    <div id="quiz-chapter-title" class="text-yellow-400 font-banger text-lg mb-1">QUIZZ 1 - MÚSICA</div>
+                    <span class="text-xs text-slate-500">PERGUNTA <span id="q-current">1</span>/16</span>
+                </div>
+            </div>
+
+            <!-- Cousin Target -->
+            <div id="cousin-banner" class="mb-4 text-center">
+                <span class="bg-green-600 text-white px-4 py-1 rounded-full text-sm font-bold uppercase shadow-lg animate-pulse">
+                    Esta é para ti, <span id="cousin-name" class="font-banger text-xl tracking-wide ml-1"></span>!
+                </span>
+            </div>
+
+            <!-- Question Card -->
+            <div id="question-card" class="bg-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl border-2 border-slate-700 mb-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-red-500/20 to-transparent rounded-bl-full"></div>
+                
+                <h2 id="question-text" class="text-2xl md:text-3xl font-bold mb-6 text-center leading-tight">
+                    <!-- Question goes here -->
+                </h2>
+
+                <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Options go here -->
+                </div>
+            </div>
+
+            <!-- Feedback / Joke Area -->
+            <div id="feedback-area" class="hidden text-center mt-4 card-enter">
+                <div id="feedback-icon" class="text-5xl mb-2">🤔</div>
+                <h3 id="feedback-title" class="text-2xl font-rock mb-2 text-yellow-400"></h3>
+                <p id="feedback-text" class="text-gray-300 italic mb-4">Guardado no cofre...</p>
+                <button id="next-btn" onclick="nextStep()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl shadow-lg transition-all">
+                    Próxima <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- INTERIM RESULT SCREEN (GIFT PAUSE) -->
+        <div id="interim-screen" class="hidden text-center card-enter pt-4">
+            <h2 class="text-4xl md:text-5xl font-banger text-green-400 mb-4 animate-pulse drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]">
+                PODEM ABRIR A PRENDA!
+            </h2>
+            
+            <div class="text-6xl mb-4 animate-bounce">
+                🎁
+            </div>
+            
+            <p class="text-lg mb-6 text-gray-300 font-rock">
+                Enquanto rasgam papel, vejam quem acertou:
+            </p>
+
+            <!-- Results Summary -->
+            <div class="bg-slate-800/90 rounded-xl border border-slate-600 p-4 mb-6 text-left shadow-xl backdrop-blur-sm">
+                <h3 class="text-yellow-400 font-bold mb-3 text-center border-b border-slate-600 pb-2">RESUMO DA RONDA</h3>
+                <div id="round-results-container" class="space-y-3">
+                    <!-- JS injects results here -->
+                </div>
+            </div>
+
+            <!-- Round Champion -->
+            <div id="round-champion-box" class="mb-6 hidden">
+                <div class="text-sm text-gray-400 uppercase tracking-widest">Campeão(ões) desta ronda</div>
+                <div id="round-champion-names" class="text-2xl font-banger text-white"></div>
+            </div>
+            
+            <br>
+            <p class="text-sm text-gray-500 mb-8 animate-pulse">(A aguardar abertura...)</p>
+            <button onclick="continueGame()" class="secret-btn text-gray-400 text-2xl hover:text-white border border-gray-700 hover:border-white px-4 py-2 rounded transition-all">
+                =>
+            </button>
+        </div>
+
+        <!-- FINAL GIFT SCREEN -->
+        <div id="gift-screen" class="hidden text-center pt-10 card-enter">
+            <h2 class="text-5xl font-banger text-green-400 mb-8">RESULTADO FINAL</h2>
+            
+            <div class="mb-8">
+                <div class="text-xl text-gray-300 mb-4">E os Grandes Campeões são...</div>
+                <div id="final-champion" class="text-3xl md:text-4xl font-rock text-yellow-400 animate-pulse leading-normal">
+                    Sara, Sofia, João & Gonçalo! 🏆
+                </div>
+            </div>
+
+            <div class="mb-10 text-xl text-gray-300">
+                (Independente dos resultados, vocês partem isto tudo! 🎉)
+            </div>
+
+            <!-- Stage 1: The Button -->
+            <div id="gift-stage-1">
+                <button onclick="revealGiftStage2()" class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black font-banger text-3xl py-4 px-12 rounded-lg shadow-[0_0_20px_rgba(251,191,36,0.5)] transform transition hover:scale-105 animate-bounce">
+                    VER SURPRESA FINAL 🎁
+                </button>
+            </div>
+
+            <!-- Stage 2: The Message -->
+            <div id="gift-stage-2" class="hidden mt-8">
+                <h1 class="text-5xl md:text-7xl font-rock text-red-500 animate-pulse mb-8 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]">
+                    PODES ABRIR A PRENDA!
+                </h1>
+                
+                <div class="text-8xl my-10 animate-bounce">
+                    🎅🎄🎁
+                </div>
+
+                <p class="text-sm text-gray-500 mb-20 animate-pulse">
+                    (A aguardar abertura...)
+                </p>
+
+                <!-- Discreet Next Button -->
+                <div class="fixed bottom-4 right-4">
+                    <button onclick="finishGame()" class="secret-btn text-gray-600 text-xs hover:text-white border border-gray-700 hover:border-white px-2 py-1 rounded">
+                        Next >
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINAL THANKS SCREEN -->
+        <div id="thanks-screen" class="hidden text-center pt-20 card-enter">
+             <h1 class="text-6xl font-rock text-white mb-4">FELIZ NATAL!</h1>
+             <p class="text-xl text-gray-400">Vemo-nos no mosh pit em 2026. 🤘</p>
+             <button onclick="location.reload()" class="mt-10 text-slate-500 hover:text-slate-300 underline">Reiniciar</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA ---
+        
+        // ============================================
+        // CONFIGURAÇÃO DE MÚSICA (Coloca os links aqui!)
+        // ============================================
+        const quizTracks = [
+            // QUIZZ 1 - MÚSICA (Link MP3)
+            "https://p.scdn.co/mp3-preview/3eb16018c2a70023253551507563045ea781126d?cid=774b29d4f13844c495f206cafdad9c86", 
+            // QUIZZ 2 - BILHETE (Link MP3)
+            "https://p.scdn.co/mp3-preview/1723223075c3f37b0c3671234907a909477e5d88?cid=774b29d4f13844c495f206cafdad9c86",
+            // QUIZZ 3 - AVIÃO (Link MP3)
+            "https://p.scdn.co/mp3-preview/a6d078d4615d9a9446d338a0c20a672778844890?cid=774b29d4f13844c495f206cafdad9c86",
+            // QUIZZ 4 - SURPRESA (Link MP3)
+            "https://p.scdn.co/mp3-preview/82b9576c72e259e8312e75342a9b4334f40f3531?cid=774b29d4f13844c495f206cafdad9c86" 
+        ];
+        // Nota: Usei previews do Spotify como exemplo de placeholder. 
+        // Substitui por links Raw do GitHub (ex: https://github.com/user/repo/raw/main/song.mp3)
+        // ============================================
+
+        const cousins = ['Sara', 'Sofia', 'João', 'Gonçalo'];
+        
+        // Quizz Definitions
+        const quizStages = [
+            { name: "MÚSICA", icon: "fa-music" },
+            { name: "BILHETE", icon: "fa-ticket-alt" },
+            { name: "AVIÃO", icon: "fa-plane" },
+            { name: "SURPRESA", icon: "fa-gift" }
+        ];
+
+        // GENRES: 'pop', 'rock', 'heavy', 'indie', 'tuga'
+        const allQuestions = [
+            // QUIZZ 1 - MÚSICA
+            {
+                q: "Qual é a cantora que, segundo rumores fortes, vai beijar uma rapariga (e gostar) no Parque Tejo em 2026?",
+                options: ["Madonna", "Katy Perry", "Dua Lipa", "Lady Gaga"],
+                correct: 1,
+                fact: "Katy Perry foi confirmada (quase de certeza)!",
+                genre: "pop"
+            },
+            {
+                q: "Que lenda do rock, com cabelo espetado há 50 anos, vai cantar 'Da Ya Think I'm Sexy' aos 81 anos?",
+                options: ["Mick Jagger", "Rod Stewart", "Steven Tyler", "Iggy Pop"],
+                correct: 1,
+                fact: "Rod Stewart, o avô do Rock in Rio!",
+                genre: "indie" 
+            },
+            {
+                q: "Qual é a banda que vai fazer o Passeio Marítimo de Algés gritar 'THE PRETENDER'?",
+                options: ["Nirvana (Holograma)", "Foo Fighters", "Pearl Jam", "Queens of the Stone Age"],
+                correct: 1,
+                fact: "Foo Fighters! Dave Grohl vem aí.",
+                genre: "rock"
+            },
+            {
+                q: "Quem é o DJ brasileiro que vai pôr toda a gente a fazer de 'Dançarina'?",
+                options: ["Alok", "Pedro Sampaio", "Dennis DJ", "Kevinho"],
+                correct: 1,
+                fact: "PE-DRO SAM-PA-IO! Chão a tremer.",
+                genre: "pop"
+            },
+
+            // QUIZZ 2 - BILHETE
+            {
+                q: "Que banda mítica do Nu Metal regressa com uma nova vocalista para nos deixar 'Numb'?",
+                options: ["Limp Bizkit", "Korn", "Linkin Park", "System of a Down"],
+                correct: 2,
+                fact: "Linkin Park estão de volta!",
+                genre: "heavy"
+            },
+            {
+                q: "Qual é a banda Portuguesa que se vai reunir no NOS Alive para pôr tudo a bater o 'Wegue Wegue'?",
+                options: ["Da Weasel", "Buraka Som Sistema", "Expensive Soul", "Mind da Gap"],
+                correct: 1,
+                fact: "Buraka Som Sistema! Kuduro progressivo.",
+                genre: "electronic"
+            },
+            {
+                q: "Quem são as irmãs mexicanas que vão destruir o palco principal do Alive com rock puro?",
+                options: ["HAIM", "The Warning", "Las Ketchup", "The Bangles"],
+                correct: 1,
+                fact: "The Warning! Rock mexicano a sério.",
+                genre: "rock"
+            },
+            {
+                q: "Que banda brasileira está a fazer a sua 'Despedida' (pela 2ª vez) no Rock in Rio?",
+                options: ["Sepultura", "Angra", "Ratos de Porão", "Titãs"],
+                correct: 0,
+                fact: "Sepultura! Último headbang.",
+                genre: "heavy"
+            },
+
+            // QUIZZ 3 - AVIÃO
+            {
+                q: "Quem é a ruiva que costuma correr descalça e vai encantar o NOS Alive?",
+                options: ["Florence + The Machine", "Hayley Williams", "Tori Amos", "Ed Sheeran (de peruca)"],
+                correct: 0,
+                fact: "Florence Welch! Tragam as flores.",
+                genre: "indie"
+            },
+            {
+                q: "Que banda dos anos 90 vai perguntar 'What's Up?' no Parque Tejo?",
+                options: ["The Cranberries", "4 Non Blondes", "No Doubt", "Garbage"],
+                correct: 1,
+                fact: "4 Non Blondes! Hey ey ey ey!",
+                genre: "indie"
+            },
+            {
+                q: "Que duo americano vem stressado ('Stressed Out') tocar bateria e ukulele?",
+                options: ["Twenty One Pilots", "The Black Keys", "Royal Blood", "MGMT"],
+                correct: 0,
+                fact: "Twenty One Pilots! Saltos mortais.",
+                genre: "pop"
+            },
+            {
+                q: "Quem é o 'Príncipe das Trevas' poético que vai trazer os Bad Seeds a Lisboa?",
+                options: ["Ozzy Osbourne", "Nick Cave", "Marilyn Manson", "Robert Smith"],
+                correct: 1,
+                fact: "Nick Cave! Intenso e poético.",
+                genre: "indie"
+            },
+
+            // QUIZZ 4 - SURPRESA
+            {
+                q: "Qual é a banda Tuga que NÃO PODE faltar ao Rock in Rio (senão o palco cai)?",
+                options: ["GNR", "UHF", "Xutos & Pontapés", "D'ZRT"],
+                correct: 2,
+                fact: "Xutos! A 'Minha Casinha' é obrigatória.",
+                genre: "tuga"
+            },
+            {
+                q: "Que ícone dos anos 80 diz que 'Girls Just Want to Have Fun'?",
+                options: ["Madonna", "Cyndi Lauper", "Bonnie Tyler", "Tina Turner"],
+                correct: 1,
+                fact: "Cyndi Lauper! Diversão garantida.",
+                genre: "pop"
+            },
+            {
+                q: "Que banda britânica 'fixe' liderada pela Ellie Rowsell vai estar no Alive?",
+                options: ["Wet Leg", "Wolf Alice", "Pale Waves", "London Grammar"],
+                correct: 1,
+                fact: "Wolf Alice! Indie rock do bom.",
+                genre: "rock"
+            },
+            {
+                q: "Para acabar: Quem é a cantora que costuma atuar descalça e adora chá (Soul/R&B)?",
+                options: ["Adele", "Amy Winehouse", "Joss Stone", "Alicia Keys"],
+                correct: 2,
+                fact: "Joss Stone! A simpatia em pessoa.",
+                genre: "indie"
+            }
+        ];
+
+        const ambiguousPhrases = [
+            "Hummm... será?",
+            "Essa foi com confiança!",
+            "Interessante escolha...",
+            "Vou anotar no meu caderno...",
+            "O sistema registou a tua ousadia.",
+            "Vamos ver se tens sorte!",
+            "Achas mesmo?",
+            "Ok, está registado!"
+        ];
+
+        // --- STATE ---
+        let currentQIndex = 0;
+        let score = 0;
+        let cousinOrder = [];
+        let cousinScores = { 'Sara': 0, 'Sofia': 0, 'João': 0, 'Gonçalo': 0 };
+        let roundResults = []; 
+
+        // --- AUDIO ENGINE ---
+        let audioCtx;
+        let backgroundAudio = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playBackgroundMusic(stageIndex) {
+            // If we are already playing this track, do nothing
+            // (Note: we stop music on answer, so we usually need to restart)
+            
+            if (backgroundAudio) {
+                backgroundAudio.pause();
+                backgroundAudio = null;
+            }
+
+            const url = quizTracks[stageIndex];
+            if (!url) return;
+
+            backgroundAudio = new Audio(url);
+            backgroundAudio.loop = true;
+            backgroundAudio.volume = 0.5;
+            
+            // Visualizer Show
+            document.getElementById('music-bars').classList.remove('opacity-0');
+
+            backgroundAudio.play().catch(e => {
+                console.log("Autoplay prevent or error:", e);
+                // Can't do much without user interaction, but game started with interaction
+            });
+        }
+
+        function stopBackgroundMusic() {
+            if (backgroundAudio) {
+                backgroundAudio.pause();
+                backgroundAudio.currentTime = 0;
+            }
+            document.getElementById('music-bars').classList.add('opacity-0');
+        }
+
+        // --- FX SOUNDS (Oscillators) ---
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            if (type === 'select') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'win') {
+                // Success chord
+                stopBackgroundMusic(); // Stop beat on win/interim
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const osc3 = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc1.connect(gain); osc2.connect(gain); osc3.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc1.type = 'triangle'; osc2.type = 'triangle'; osc3.type = 'triangle';
+                osc1.frequency.value = 440;
+                osc2.frequency.value = 554;
+                osc3.frequency.value = 659;
+
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+                osc1.start(); osc2.start(); osc3.start();
+                osc1.stop(audioCtx.currentTime + 0.8);
+                osc2.stop(audioCtx.currentTime + 0.8);
+                osc3.stop(audioCtx.currentTime + 0.8);
+            }
+        }
+
+        function playSynthNote(time, freq, type, duration) {
+             // Helper for Win sound if needed, merged above for simplicity
+        }
+
+        // --- LOGIC ---
+
+        function initLights() {
+            const container = document.getElementById('lights');
+            for(let i=0; i<30; i++) {
+                const div = document.createElement('div');
+                div.className = 'light';
+                container.appendChild(div);
+            }
+        }
+
+        function shuffleCousins() {
+            cousinOrder = [];
+            for (let r = 0; r < 4; r++) {
+                 let roundCousins = [...cousins].sort(() => Math.random() - 0.5);
+                 cousinOrder.push(...roundCousins);
+            }
+        }
+
+        function startGame() {
+            initAudio();
+            initLights();
+            shuffleCousins();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('sidebar').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function updateSidebar() {
+            const stageIndex = Math.floor(currentQIndex / 4);
+
+            for (let i = 0; i < 4; i++) {
+                const el = document.getElementById(`stage-${i}`);
+                el.classList.remove('active');
+                
+                // Show icon if we are at this stage or past it
+                if (i <= stageIndex) {
+                    el.classList.add('visible');
+                }
+
+                // If it's the current stage
+                if (i === stageIndex && currentQIndex < allQuestions.length) {
+                    el.classList.add('active');
+                }
+
+                // If this stage is completed (we are past it)
+                if (i < stageIndex) {
+                    el.classList.add('completed');
+                }
+            }
+        }
+
+        function loadQuestion() {
+            const q = allQuestions[currentQIndex];
+            const stageIndex = Math.floor(currentQIndex / 4);
+            const stageInfo = quizStages[stageIndex];
+            
+            updateSidebar();
+
+            // Start Quiz Music (MP3)
+            playBackgroundMusic(stageIndex);
+
+            // Update Chapter Title
+            document.getElementById('quiz-chapter-title').innerText = `QUIZZ ${stageIndex + 1} - ${stageInfo.name}`;
+
+            // UI Reset
+            document.getElementById('question-card').classList.remove('shake');
+            document.getElementById('feedback-area').classList.add('hidden');
+            document.getElementById('options-grid').classList.remove('hidden');
+            document.getElementById('options-grid').innerHTML = ''; // Clear options
+            document.getElementById('score-display').innerText = "?"; // Hide score during play
+
+            // Update Text
+            document.getElementById('q-current').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('cousin-name').innerText = cousinOrder[currentQIndex];
+
+            // Render Options
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn bg-slate-700 hover:bg-slate-600 text-white font-semibold py-4 px-6 rounded-lg shadow-md transition-all text-left border border-slate-600";
+                btn.innerHTML = `<span class="inline-block w-8 h-8 bg-slate-900 rounded-full text-center leading-8 mr-3 text-sm text-gray-400">${String.fromCharCode(65+idx)}</span> ${opt}`;
+                btn.onclick = () => checkAnswer(idx);
+                document.getElementById('options-grid').appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex) {
+            stopBackgroundMusic(); // Silence on answer for suspense
+            const q = allQuestions[currentQIndex];
+            const currentCousin = cousinOrder[currentQIndex];
+            const buttons = document.getElementById('options-grid').children;
+            let isCorrect = selectedIndex === q.correct;
+
+            // Visual feedback (Neutral/Ambiguous)
+            playSound('select');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                buttons[i].classList.remove('hover:bg-slate-600');
+                if (i === selectedIndex) {
+                    buttons[i].classList.add('bg-yellow-600', 'border-yellow-400');
+                    buttons[i].classList.remove('bg-slate-700');
+                } else {
+                    buttons[i].classList.add('opacity-50');
+                }
+            }
+
+            if (isCorrect) {
+                score++;
+                cousinScores[currentCousin]++;
+            }
+            
+            roundResults.push({
+                cousin: currentCousin,
+                correct: isCorrect,
+                fact: q.fact,
+                questionSnippet: q.q.substring(0, 30) + "..."
+            });
+
+            const fbTitle = document.getElementById('feedback-title');
+            const fbText = document.getElementById('feedback-text');
+            
+            fbTitle.innerText = ambiguousPhrases[Math.floor(Math.random() * ambiguousPhrases.length)];
+            fbText.innerText = "Saberás o resultado na pausa da prenda...";
+            
+            document.getElementById('feedback-area').classList.remove('hidden');
+        }
+
+        function nextStep() {
+            currentQIndex++;
+
+            if (currentQIndex === allQuestions.length) {
+                showFinalResult();
+            } else if (currentQIndex % 4 === 0) {
+                showInterim();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function showInterim() {
+            playSound('win'); 
+            
+            // Mark previous stage as completed visually immediately
+            const stageIndex = Math.floor((currentQIndex - 1) / 4);
+            document.getElementById(`stage-${stageIndex}`).classList.add('completed');
+            document.getElementById(`stage-${stageIndex}`).classList.remove('active');
+
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('interim-screen').classList.remove('hidden');
+            
+            const container = document.getElementById('round-results-container');
+            container.innerHTML = '';
+            
+            let roundWinners = [];
+
+            roundResults.forEach(res => {
+                const row = document.createElement('div');
+                row.className = "flex items-start justify-between bg-slate-700/50 p-3 rounded-lg";
+                
+                const icon = res.correct ? '✅' : '❌';
+                const textClass = res.correct ? 'text-green-300' : 'text-red-300';
+                
+                if(res.correct) roundWinners.push(res.cousin);
+
+                row.innerHTML = `
+                    <div class="flex-1">
+                        <div class="font-bold ${textClass}">
+                            ${icon} ${res.cousin}
+                        </div>
+                        <div class="text-xs text-gray-400 mt-1">${res.fact}</div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+
+            const champBox = document.getElementById('round-champion-box');
+            const champNames = document.getElementById('round-champion-names');
+            
+            if (roundWinners.length > 0) {
+                champBox.classList.remove('hidden');
+                let uniqueWinners = [...new Set(roundWinners)];
+                champNames.innerText = uniqueWinners.join(" & ") + " 🎉";
+            } else {
+                champBox.classList.remove('hidden');
+                champNames.innerText = "Ninguém... 🦗";
+            }
+            
+            roundResults = [];
+        }
+
+        function continueGame() {
+            document.getElementById('interim-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function showFinalResult() {
+            playSound('win');
+            
+            // Mark last stage completed
+            document.getElementById(`stage-3`).classList.add('completed');
+            document.getElementById(`stage-3`).classList.remove('active');
+            
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('interim-screen').classList.add('hidden'); 
+            document.getElementById('gift-screen').classList.remove('hidden');
+            
+            document.getElementById('final-champion').innerText = "Sara, Sofia, João & Gonçalo! 🏆";
+            
+            startSnow();
+        }
+
+        function revealGiftStage2() {
+            document.getElementById('gift-stage-1').classList.add('hidden');
+            document.getElementById('gift-stage-2').classList.remove('hidden');
+            
+            var duration = 3000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff0000', '#00ff00', '#ffffff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff0000', '#00ff00', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        function finishGame() {
+            document.getElementById('gift-screen').classList.add('hidden');
+            document.getElementById('thanks-screen').classList.remove('hidden');
+        }
+
+        function startSnow() {
+            setInterval(createSnowflake, 100);
+        }
+
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.innerHTML = '❄';
+            snowflake.style.left = Math.random() * 100 + 'vw';
+            snowflake.style.animationDuration = Math.random() * 3 + 2 + 's'; 
+            snowflake.style.opacity = Math.random();
+            snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+            
+            document.body.appendChild(snowflake);
+            
+            setTimeout(() => {
+                snowflake.remove();
+            }, 5000);
+        }
+
+    </script>
+</body>
+</html>
